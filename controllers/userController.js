@@ -1,5 +1,5 @@
 // const { ObjectId } = require('mongodb').Types;
-const  User  = require('../models/User');
+const User = require('../models/User');
 
 module.exports = {
     // get all users
@@ -8,7 +8,7 @@ module.exports = {
             const dbUserData = await User.find({}).populate('thoughts').populate('friends');
             res.json(dbUserData);
         }
-        catch(err) {
+        catch (err) {
             console.log(err);
             res.status(500).json(err);
         };
@@ -23,7 +23,7 @@ module.exports = {
             };
             res.json(dbUserData);
         }
-        catch(err) {
+        catch (err) {
             console.log(err);
             res.status(500).json(err);
         }
@@ -34,7 +34,7 @@ module.exports = {
             const dbUserData = await User.create(body);
             res.json(dbUserData);
         }
-        catch(err) {
+        catch (err) {
             console.log(err);
             res.status(500).json(err);
         };
@@ -42,9 +42,10 @@ module.exports = {
     // update user by id
     async updateUser({ params, body }, res) {
         try {
-            const dbUserData = User.findOneAndUpdate({ _id: params.id }, body, { new: true, runValidators: true });
+            const dbUserData = await User.findOneAndUpdate({ _id: params.id }, body);
+            res.json(dbUserData);
         }
-        catch(err) {
+        catch (err) {
             console.log(err);
             res.status(500).json(err);
         };
@@ -58,15 +59,18 @@ module.exports = {
                 return;
             };
             // remove user's thoughts
-            await Thought.deleteMany({ username: dbUserData.username });
-            // remove user from friends list
-            await User.updateMany(
-                { _id: { $in: dbUserData.friends } },
-                { $pull: { friends: params.id } }
-            );
+            if (dbUserData.thoughts.length > 0) {
+                await Thought.deleteMany({ username: dbUserData.username });
+                // remove user from friends list
+                await User.updateMany(
+                    { _id: { $in: dbUserData.friends } },
+                    { $pull: { friends: params.id } }
+
+                );
+            };
             res.json({ message: 'User and associated thoughts deleted!' });
         }
-        catch(err) {
+        catch (err) {
             console.log(err);
             res.status(500).json(err);
         }
@@ -85,7 +89,7 @@ module.exports = {
             };
             res.json(dbUserData);
         }
-        catch(err) {
+        catch (err) {
             console.log(err);
             res.status(500).json(err);
         }
@@ -104,7 +108,7 @@ module.exports = {
             };
             res.json({ message: 'Friend removed!' });
         }
-        catch(err) {
+        catch (err) {
             console.log(err);
             res.status(500).json(err);
         }
