@@ -119,7 +119,7 @@ module.exports = {
                 { new: true }
             );
             if (!dbThoughtData) {
-                res.status(404).json({ message: 'No thought found with this id!' });
+                res.status(404).json({ message: 'No thought reaction found with this id!' });
                 return;
             };
             res.json({ message: 'Reaction successfully deleted!' });
